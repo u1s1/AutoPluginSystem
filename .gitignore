@@ -1,0 +1,6 @@
+.vscode/*
+build/*
+AutoPluginSystem/build/*
+CustomerSDK/build/*
+test/Customer/build/*
+test/System/build/*
