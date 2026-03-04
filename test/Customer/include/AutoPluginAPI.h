@@ -4,6 +4,6 @@
 #include "AutoPluginABI.h"
 #include "AutoPluginExport.h"
 
-void AutoPluginLog(LogLevel level, const char* message);
+void AutoPluginLog(const char* message);
 
 #endif

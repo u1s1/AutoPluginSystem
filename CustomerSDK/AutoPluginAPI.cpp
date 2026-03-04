@@ -9,8 +9,8 @@ void Internal_InitHostAPI(void* queryFunc) {
     g_queryApi = reinterpret_cast<PFN_QueryHostAPI>(queryFunc);
 }
 
-typedef void (*PFN_AuoPluginLog_Impl)(LogLevel, const char*);
-void AutoPluginLog(LogLevel level, const char *message)
+typedef void (*PFN_AuoPluginLog_Impl)(const char*);
+void AutoPluginLog(const char *message)
 {
     if (!g_queryApi)
     {
@@ -23,7 +23,7 @@ void AutoPluginLog(LogLevel level, const char *message)
     
     // 之后的所有调用，直接通过函数指针跳转，零查表开销
     if (real_func) {
-        real_func(level, message);
+        real_func(message);
     } else {
         printf("[Plugin SDK Error] Cannot find 'SystemLog' in Host Registry!\n");
     }

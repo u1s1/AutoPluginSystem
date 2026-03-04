@@ -1,8 +1,5 @@
 #ifndef AUTOPLUGINABI_H
 #define AUTOPLUGINABI_H
-
-enum class LogLevel { Info, Warning, Error };
-
 // 核心契约：万能查询函数的函数指针类型
 // 宿主实现它，插件调用它
 typedef void* (*PFN_QueryHostAPI)(const char* apiName);

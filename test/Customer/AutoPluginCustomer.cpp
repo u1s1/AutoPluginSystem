@@ -8,12 +8,12 @@ EXPORT_PLUGIN_ENTRY()
 extern "C" PLUGIN_EXPORT bool StartPlugin() {
     
     // 直接像调原生 C 函数一样使用宿主功能！
-    AutoPluginLog(LogLevel::Info, "Hello from Plugin! Static cache is amazing!");
+    AutoPluginLog("Hello from Plugin! Static cache is amazing!");
     
     return true;
 }
 
 // 3. 插件停止逻辑
 extern "C" PLUGIN_EXPORT void StopPlugin() {
-    AutoPluginLog(LogLevel::Info, "Plugin is shutting down.");
+    AutoPluginLog("Plugin is shutting down.");
 }
