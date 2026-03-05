@@ -14,7 +14,7 @@ struct DriverDispatchTable {
     
     // 设备管理 (低频)
     int (*CreateDevice)();
-    void         (*DestroyDevice)(int device);
+    void (*DestroyDevice)(int device);
 };
 
 // 驱动 DLL 必须导出的唯一入口
