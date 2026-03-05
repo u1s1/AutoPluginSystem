@@ -1,4 +1,4 @@
-#include "../include/AutoPluginManager.h"
+#include "AutoPluginManager.h"
 
 int main()
 {
@@ -10,6 +10,7 @@ int main()
         std::cout << "Failed to load or start plugin." << std::endl;
     }
     manager.Unload();
+    std::cout << std::endl;
 
     if (manager.LoadAndStart("MyPlugin.dll")) {
         std::cout << "Plugin loaded and started successfully!" << std::endl;

@@ -1,4 +1,3 @@
-#include "../include/AutoPluginManager.h"
 #include "AutoPluginManager.h"
 
 // 万能查询通道的具体实现

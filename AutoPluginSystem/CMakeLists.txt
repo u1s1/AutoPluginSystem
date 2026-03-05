@@ -7,11 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 2. 收集宿主的所有源文件
 # 提示：如果你的源文件很多，可以使用 file(GLOB SOURCES "src/*.cpp")，但直接列出更利于维护
-set(HOST_SOURCES
-    src/AutoPlugin.cpp
-    src/AutoPluginManager.cpp
-    src/TempServer.cpp
-)
+file(GLOB_RECURSE HOST_SOURCES "src/*.cpp")
 
 # 3. 定义目标：编译为可执行文件 (Executable)
 add_executable(HostMain ${HOST_SOURCES})

@@ -2,5 +2,6 @@
 build/*
 AutoPluginSystem/build/*
 CustomerSDK/build/*
+DriverSDK/build/*
 test/Customer/build/*
 test/System/build/*
