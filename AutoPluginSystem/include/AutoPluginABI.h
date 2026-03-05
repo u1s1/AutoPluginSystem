@@ -8,5 +8,6 @@ typedef void* (*PFN_QueryHostAPI)(const char* apiName);
 typedef void (*PFN_SetupPluginAPI)(PFN_QueryHostAPI queryFunc);
 typedef bool (*PFN_StartPlugin)();
 typedef void (*PFN_StopPlugin)();
+typedef void (*PFN_UninstallPlugin)();
 
 #endif

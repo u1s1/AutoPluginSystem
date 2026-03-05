@@ -1,4 +1,5 @@
 #include "../include/AutoPluginManager.h"
+#include "AutoPluginManager.h"
 
 // 万能查询通道的具体实现
 void* QueryAPI(const char* apiName) {
@@ -24,8 +25,9 @@ bool PluginManager::LoadAndStart(const char *pluginPath)
     auto setupFunc = (PFN_SetupPluginAPI)GET_FUNC(m_handle, "SetupPluginAPI");
     auto startFunc = (PFN_StartPlugin)GET_FUNC(m_handle, "StartPlugin");
     m_stopFunc = (PFN_StopPlugin)GET_FUNC(m_handle, "StopPlugin");
+    m_uninstallFunc = (PFN_UninstallPlugin)GET_FUNC(m_handle, "UninstallPlugin");
 
-    if (!setupFunc || !startFunc || !m_stopFunc) {
+    if (!setupFunc || !startFunc || !m_stopFunc || !m_uninstallFunc) {
         CLOSE_LIB(m_handle);
         return false;
     }
@@ -44,4 +46,16 @@ void PluginManager::Unload()
         CLOSE_LIB(m_handle);
         m_handle = nullptr;
     }
+}
+
+void PluginManager::Uninstall()
+{
+    if (m_handle && m_stopFunc && m_uninstallFunc) {
+        m_stopFunc();
+        m_uninstallFunc();
+        CLOSE_LIB(m_handle);
+        m_handle = nullptr;
+    }
+    //下面执行删除插件文件及收尾操作
+    /* */
 }

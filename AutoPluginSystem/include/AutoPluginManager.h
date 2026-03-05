@@ -28,9 +28,12 @@ public:
 
     void Unload();
 
+    void Uninstall();
+
 private:
     LibHandle m_handle = nullptr;
     PFN_StopPlugin m_stopFunc = nullptr;
+    PFN_UninstallPlugin m_uninstallFunc = nullptr;
 };
 
 #endif
