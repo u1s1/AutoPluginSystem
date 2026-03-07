@@ -1,9 +1,9 @@
 #ifndef TEMP_SERVER_H
 #define TEMP_SERVER_H
 
-#include "../include/AutoPluginABI.h"
-#include "../include/AutoPluginRegister.h"
-#include "../include/AutoPluginDriverManager.h"
+#include "AutoPluginABI.h"
+#include "AutoPluginRegister.h"
+#include "AutoPluginDriverManager.h"
 #include <iostream>
 
 // 实现系统日志

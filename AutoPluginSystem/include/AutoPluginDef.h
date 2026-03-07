@@ -1,3 +1,7 @@
+#ifndef AUTO_PLUGIN_DEF_H
+#define AUTO_PLUGIN_DEF_H
+#include <string>
+
 #if defined(_WIN32)
     #include <windows.h>
     typedef HMODULE LibHandle;
@@ -10,4 +14,13 @@
     #define LOAD_LIB(path) dlopen(path, RTLD_LAZY)
     #define GET_FUNC dlsym
     #define CLOSE_LIB dlclose
+#endif
+
+struct PluginInfo{
+    std::string name;
+    std::string version;
+    std::string author;
+    std::string relativeDirectory;
+    bool running = false;
+};
 #endif

@@ -1,22 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
 project(MySystemHost CXX)
 
-# 1. 强制使用现代 C++ 标准 (C++11 或更高，因为用到了 magic statics 和 unordered_map)
-set(CMAKE_CXX_STANDARD 11)
+# 1. 强制使用现代 C++ 标准 (C++17 或更高，因为用到了 magic statics 和 unordered_map)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 2. 收集宿主的所有源文件
 # 提示：如果你的源文件很多，可以使用 file(GLOB SOURCES "src/*.cpp")，但直接列出更利于维护
 file(GLOB_RECURSE HOST_SOURCES "src/*.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/common/*.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/pluginManage/*.cpp")
+file(GLOB_RECURSE DRIVER_SOURCES "src/driverManage/*.cpp")
 
 # 3. 定义目标：编译为可执行文件 (Executable)
-add_executable(HostMain ${HOST_SOURCES})
+add_executable(HostMain ${HOST_SOURCES} ${PLUGIN_SOURCES} ${DRIVER_SOURCES})
 
 # 4. 设置头文件包含路径
 # 让 src 下的 cpp 文件能够 #include "../Shared/HostABI.h"
 target_include_directories(HostMain PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/threadpool
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/pluginManage
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/driverManage
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/pluginManage
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/driverManage
 )
 
 # ---------------------------------------------------------
