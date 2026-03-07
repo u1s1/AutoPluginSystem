@@ -26,7 +26,7 @@ private:
 
     static PluginInstallInfoMannager& getInstance()
     {
-        PluginInstallInfoMannager instance;
+        static PluginInstallInfoMannager instance;
         return instance;
     }
 

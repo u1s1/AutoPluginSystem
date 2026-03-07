@@ -13,6 +13,7 @@ PluginInstallInfoMannager::~PluginInstallInfoMannager()
 void PluginInstallInfoMannager::Init()
 {
     //解析配置文件，填充 m_mapPluginInfo
+    m_mapPluginInfo.clear();
 }
 
 
@@ -32,6 +33,10 @@ bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, P
 
 int PluginInstallInfoMannager::RegisterPluginInfo(const PluginInfo & info)
 {
+    if (info.name.empty())
+    {
+        return 3;
+    }
     if (getInstance().m_mapPluginInfo.find(info.name) != getInstance().m_mapPluginInfo.end())
     {
         return 1; // 已存在同名插件
@@ -45,6 +50,10 @@ int PluginInstallInfoMannager::RegisterPluginInfo(const PluginInfo & info)
 
 bool PluginInstallInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo &info)
 {
+    if (info.name.empty())
+    {
+        return 3;
+    }
     if (getInstance().m_mapPluginInfo.find(pluginName) == getInstance().m_mapPluginInfo.end())
     {
         return false;
@@ -56,6 +65,10 @@ bool PluginInstallInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo
 
 bool PluginInstallInfoMannager::SetPluginInfo(const PluginInfo & info)
 {
+    if (info.name.empty())
+    {
+        return 3;
+    }
     if (getInstance().m_mapPluginInfo.find(info.name) == getInstance().m_mapPluginInfo.end())
     {
         return false;
@@ -68,6 +81,10 @@ bool PluginInstallInfoMannager::SetPluginInfo(const PluginInfo & info)
 
 bool PluginInstallInfoMannager::DeletePluginInfo(const char * pluginName)
 {
+    if (pluginName == nullptr || std::string(pluginName).empty())
+    {
+        return 3;
+    }
     if (getInstance().m_mapPluginInfo.find(pluginName) == getInstance().m_mapPluginInfo.end())
     {
         return true; // 已经不存在了
