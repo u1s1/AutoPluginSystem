@@ -24,22 +24,26 @@ bool PluginManager::Install(const char *pluginPath, bool allCopy)
     PluginInfo pluginInfo;
     if(!PluginInstallInfoMannager::GetPluginInfoFromPath(pluginPath, pluginInfo))
     {
+        std::cout << "analysis failed" << std::endl;
         return false; // 解析失败
     }
+    
     if (PluginInstallInfoMannager::RegisterPluginInfo(pluginInfo) != 0)
     {
+        std::cout << "register failed" << std::endl;
         return false; // 注册失败
     }
 
     std::string installDir = GetExecutablePath() + "/\\" + pluginInfo.name;
     struct stat statinfo;
-    if(!stat(installDir.c_str(), & statinfo) == 0 && (statinfo.st_mode & S_IFDIR))
+    if(stat(installDir.c_str(), &statinfo) != 0)
     {
         if (MKDIR(installDir.c_str()) != 0) {
-            perror("create directory failed");
+            std::cout << "create directory failed" << std::endl;
             return false;
         }
     }
+
     if (allCopy)
     {
         
@@ -91,7 +95,9 @@ bool PluginManager::LoadAndStart(const char *pluginPath)
     m_threadPool.PushThread([this, startFunc]() {
         if (!startFunc()) {
             std::cerr << "Plugin failed to start." << std::endl;
+            return;
         }
+        this->Stop();
     });
 
     return true;
