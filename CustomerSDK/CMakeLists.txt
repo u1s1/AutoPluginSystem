@@ -3,7 +3,7 @@ project(AutoPluginAPI CXX)
 
 # 1. 定义目标：编译为一个静态库 (STATIC)
 add_library(AutoPluginAPI_static STATIC
-    AutoPluginAPI.cpp
+    ./src/AutoPluginAPI.cpp
 )
 
 # 2. 核心防坑设置：开启 -fPIC (Position Independent Code)
@@ -18,8 +18,7 @@ set_target_properties(AutoPluginAPI_static PROPERTIES POSITION_INDEPENDENT_CODE 
 # CMake 会自动把这两个 include 目录塞给 MyPlugin，开发者连 include 路径都不用自己配了！
 target_include_directories(AutoPluginAPI_static
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # 4. 强制使用至少 C++11 标准 (因为我们用到了局部静态变量等特性)
