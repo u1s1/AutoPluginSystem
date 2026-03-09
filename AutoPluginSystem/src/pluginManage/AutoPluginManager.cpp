@@ -47,6 +47,7 @@ void PluginManager::Uninstall()
     }
     //下面执行删除插件文件及收尾操作
     /* */
+    InstallOperator::UninstallPlugin(m_pluginInfo.name.c_str());
     PluginInstallInfoMannager::DeletePluginInfo(m_pluginInfo.name.c_str());
 }
 

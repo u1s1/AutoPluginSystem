@@ -20,6 +20,18 @@ int InstallOperator::InstallPlugin(const char *pluginPath,const PluginInfo& plug
 
 void InstallOperator::UninstallPlugin(const char *pluginName)
 {
+    fs::path dirToRemove = GetExecutablePath() + "/\\" + pluginName;
+    try {
+        // remove_all 删除目录及其所有内容
+        if (fs::exists(dirToRemove) && fs::is_directory(dirToRemove)) {
+            fs::remove_all(dirToRemove);
+            std::cout << "delete directory success!" << std::endl;
+        } else {
+            std::cout << "directory not exist!" << std::endl;
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "delete directory error: " << e.what() << std::endl;
+    }
 }
 
 bool InstallOperator::copy_directory_recursive(const fs::path &source, const fs::path &destination)
@@ -60,7 +72,7 @@ bool InstallOperator::copy_single_file(const fs::path &sourceFile, const fs::pat
         if (!fs::exists(destination)) {
             fs::create_directories(destination);
         }
-        
+
         if (fs::is_directory(targetPath)) {
             destination /= sourceFile.filename();
         }
