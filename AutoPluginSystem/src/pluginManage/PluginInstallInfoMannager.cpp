@@ -1,4 +1,6 @@
 #include "PluginInstallInfoMannager.h"
+#include "common.h"
+#include "IniReader.h"
 
 
 PluginInstallInfoMannager::PluginInstallInfoMannager()
@@ -14,6 +16,22 @@ void PluginInstallInfoMannager::Init()
 {
     //解析配置文件，填充 m_mapPluginInfo
     m_mapPluginInfo.clear();
+
+    IniReader reader;
+    std::string configFilePath = GetExecutablePath() + "/plugin_info.ini"; // 假设配置文件路径固定
+    if (reader.load(configFilePath)) {
+        auto sections = reader.getSections();
+        for (const auto& section : sections) {
+            auto sectionData = reader.getSectionData(section);
+            PluginInfo info;
+            info.name = section;
+            info.description = reader.getValue(section, "description", "");
+            info.version = reader.getValue(section, "version", "");
+            info.author = reader.getValue(section, "author", "");
+            info.running = false;
+            m_mapPluginInfo[info.name] = info;
+        }
+    }
 }
 
 
@@ -27,6 +45,20 @@ bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, P
     strPluginPath = strPluginPath.substr(0, lastSlash + 1); // 获取目录
     std::string configFilePath = strPluginPath + "plugin.config"; // 假设配置文件名固定
     // 解析 configFilePath，填充 info
+    IniReader reader;
+    if (reader.load(configFilePath)) {
+        auto sections = reader.getSections();
+        if (sections.empty())
+        {
+            return false;
+        }
+        
+        info.name = sections[0];
+        info.description = reader.getValue(sections[0], "description", "");
+        info.version = reader.getValue(sections[0], "version", "");
+        info.author = reader.getValue(sections[0], "author", "");
+        info.running = false;
+    }
 
     return true;
 }

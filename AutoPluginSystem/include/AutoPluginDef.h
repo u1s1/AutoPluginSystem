@@ -20,7 +20,7 @@ struct PluginInfo{
     std::string name;
     std::string version;
     std::string author;
-    std::string relativeDirectory;
+    std::string description;
     bool running = false;
 };
 #endif
