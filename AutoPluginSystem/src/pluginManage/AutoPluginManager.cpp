@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include "common.h"
-#include <sys/stat.h>
+#include "InstallOperator.h"
 
 // 万能查询通道的具体实现
 void* QueryAPI(const char* apiName) {
@@ -34,29 +34,7 @@ bool PluginManager::Install(const char *pluginPath, bool allCopy)
         return false; // 注册失败
     }
 
-    std::string installDir = GetExecutablePath() + "/\\" + pluginInfo.name;
-    struct stat statinfo;
-    if(stat(installDir.c_str(), &statinfo) != 0)
-    {
-        if (MKDIR(installDir.c_str()) != 0) {
-            std::cout << "create directory failed" << std::endl;
-            return false;
-        }
-    }
-
-    if (allCopy)
-    {
-        
-    }
-    else
-    {
-        std::ifstream in(pluginPath, std::ios::binary);
-        std::ofstream out(installDir + "/\\" + pluginInfo.name + ".dll", std::ios::binary);
-        if (!in || !out) return false;
-        out << in.rdbuf(); // 使用 rdbuf() 高效复制
-    }
-    
-    return true;
+    return InstallOperator::InstallPlugin(pluginPath, pluginInfo, allCopy) == 0;
 }
 
 void PluginManager::Uninstall()
