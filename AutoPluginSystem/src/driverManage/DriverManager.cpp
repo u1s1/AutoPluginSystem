@@ -1,14 +1,14 @@
-#include "AutoPluginDriverManager.h"
+#include "DriverManager.h"
 
-PluginDriverManager::PluginDriverManager()
+DriverManager::DriverManager()
 {
 }
 
-PluginDriverManager::~PluginDriverManager()
+DriverManager::~DriverManager()
 {
 }
 
-bool PluginDriverManager::LoadAndStart(const char *pluginPath)
+bool DriverManager::LoadAndStart(const char *pluginPath)
 {
     m_handle = LOAD_LIB(pluginPath);
     if (!m_handle) return false;
@@ -29,7 +29,7 @@ bool PluginDriverManager::LoadAndStart(const char *pluginPath)
     return true;
 }
 
-void PluginDriverManager::Unload()
+void DriverManager::Unload()
 {
     if (m_handle && m_stopFunc) {
         m_stopFunc();
@@ -38,7 +38,7 @@ void PluginDriverManager::Unload()
     }
 }
 
-void PluginDriverManager::Uninstall()
+void DriverManager::Uninstall()
 {
     if (m_handle && m_stopFunc && m_uninstallFunc) {
         m_stopFunc();

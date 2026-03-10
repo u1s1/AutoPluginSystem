@@ -1,4 +1,4 @@
-#include "AutoPluginManager.h"
+#include "PluginManager.h"
 #include <fstream>
 #include <iostream>
 #include "common.h"
@@ -22,13 +22,13 @@ PluginManager::~PluginManager()
 bool PluginManager::Install(const char *pluginPath, bool allCopy)
 {
     PluginInfo pluginInfo;
-    if(!PluginInstallInfoMannager::GetPluginInfoFromPath(pluginPath, pluginInfo))
+    if(!PluginInfoMannager::GetPluginInfoFromPath(pluginPath, pluginInfo))
     {
         std::cout << "analysis failed" << std::endl;
         return false; // 解析失败
     }
     
-    if (PluginInstallInfoMannager::RegisterPluginInfo(pluginInfo) != 0)
+    if (PluginInfoMannager::RegisterPluginInfo(pluginInfo) != 0)
     {
         std::cout << "register failed" << std::endl;
         return false; // 注册失败
@@ -48,7 +48,7 @@ void PluginManager::Uninstall()
     //下面执行删除插件文件及收尾操作
     /* */
     InstallOperator::UninstallPlugin(m_pluginInfo.name.c_str());
-    PluginInstallInfoMannager::DeletePluginInfo(m_pluginInfo.name.c_str());
+    PluginInfoMannager::DeletePluginInfo(m_pluginInfo.name.c_str());
 }
 
 bool PluginManager::LoadAndStart(const char *pluginPath)
@@ -78,7 +78,7 @@ bool PluginManager::LoadAndStart(const char *pluginPath)
 
 bool PluginManager::Start(const char *pluginName)
 {
-    if(!PluginInstallInfoMannager::GetPluginInfo(pluginName, m_pluginInfo))
+    if(!PluginInfoMannager::GetPluginInfo(pluginName, m_pluginInfo))
     {
         return false; // 解析失败
     }
@@ -89,7 +89,7 @@ bool PluginManager::Start(const char *pluginName)
     
     std::string pluginPath = GetExecutablePath() + "/\\" + m_pluginInfo.name + "/\\" + m_pluginInfo.name + ".dll";
     m_pluginInfo.running = LoadAndStart(pluginPath.c_str());
-    PluginInstallInfoMannager::SetPluginInfo(m_pluginInfo);
+    PluginInfoMannager::SetPluginInfo(m_pluginInfo);
     return m_pluginInfo.running;
 }
 
@@ -100,6 +100,6 @@ void PluginManager::Stop()
         CLOSE_LIB(m_handle);
         m_handle = nullptr;
         m_pluginInfo.running = false;
-        PluginInstallInfoMannager::SetPluginInfo(m_pluginInfo);
+        PluginInfoMannager::SetPluginInfo(m_pluginInfo);
     }
 }

@@ -1,10 +1,10 @@
-#ifndef PLUGININSTALLINFOMANAGER_H
-#define PLUGININSTALLINFOMANAGER_H
+#ifndef PLUGININFOMANAGER_H
+#define PLUGININFOMANAGER_H
 
 #include <unordered_map>
 #include "AutoPluginDef.h"
 
-class PluginInstallInfoMannager{
+class PluginInfoMannager{
 public:
     //从插件路径下自带的配置文件解析出插件信息
     static bool GetPluginInfoFromPath(const char *pluginPath, PluginInfo &info);
@@ -19,16 +19,16 @@ public:
     static bool DeletePluginInfo(const char *pluginName);
 
 private:
-    PluginInstallInfoMannager();
-    ~PluginInstallInfoMannager();
+    PluginInfoMannager();
+    ~PluginInfoMannager();
 
     void Init();
 
     void Save();
 
-    static PluginInstallInfoMannager& getInstance()
+    static PluginInfoMannager& getInstance()
     {
-        static PluginInstallInfoMannager instance;
+        static PluginInfoMannager instance;
         return instance;
     }
 

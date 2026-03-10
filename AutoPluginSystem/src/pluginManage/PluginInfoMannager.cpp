@@ -1,18 +1,18 @@
-#include "PluginInstallInfoMannager.h"
+#include "PluginInfoMannager.h"
 #include "common.h"
 #include "IniOperator.h"
 
 
-PluginInstallInfoMannager::PluginInstallInfoMannager()
+PluginInfoMannager::PluginInfoMannager()
 {
     Init();
 }
 
-PluginInstallInfoMannager::~PluginInstallInfoMannager()
+PluginInfoMannager::~PluginInfoMannager()
 {
 }
 
-void PluginInstallInfoMannager::Init()
+void PluginInfoMannager::Init()
 {
     //解析配置文件，填充 m_mapPluginInfo
     m_mapPluginInfo.clear();
@@ -33,7 +33,7 @@ void PluginInstallInfoMannager::Init()
     }
 }
 
-void PluginInstallInfoMannager::Save()
+void PluginInfoMannager::Save()
 {
     IniOperator writer(GetExecutablePath() + "/plugin_info.ini");
     for (const auto& pair : getInstance().m_mapPluginInfo) {
@@ -42,7 +42,7 @@ void PluginInstallInfoMannager::Save()
     writer.save();
 }
 
-bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, PluginInfo & info)
+bool PluginInfoMannager::GetPluginInfoFromPath(const char * pluginPath, PluginInfo & info)
 {
     std::string strPluginPath(pluginPath);
     size_t lastSlash = strPluginPath.find_last_of("/\\");
@@ -70,7 +70,7 @@ bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, P
     return true;
 }
 
-int PluginInstallInfoMannager::RegisterPluginInfo(const PluginInfo & info)
+int PluginInfoMannager::RegisterPluginInfo(const PluginInfo & info)
 {
     if (info.name.empty())
     {
@@ -96,7 +96,7 @@ int PluginInstallInfoMannager::RegisterPluginInfo(const PluginInfo & info)
     return 0; // 注册成功
 }
 
-bool PluginInstallInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo &info)
+bool PluginInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo &info)
 {
     if (pluginName == nullptr || std::string(pluginName).empty())
     {
@@ -111,7 +111,7 @@ bool PluginInstallInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo
     return true;
 }
 
-bool PluginInstallInfoMannager::SetPluginInfo(const PluginInfo & info)
+bool PluginInfoMannager::SetPluginInfo(const PluginInfo & info)
 {
     if (info.name.empty())
     {
@@ -128,7 +128,7 @@ bool PluginInstallInfoMannager::SetPluginInfo(const PluginInfo & info)
     return true;
 }
 
-bool PluginInstallInfoMannager::DeletePluginInfo(const char * pluginName)
+bool PluginInfoMannager::DeletePluginInfo(const char * pluginName)
 {
     if (pluginName == nullptr || std::string(pluginName).empty())
     {

@@ -1,10 +1,10 @@
-#ifndef AUTOPLUGINMANAGER_H
-#define AUTOPLUGINMANAGER_H
+#ifndef PLUGINMANAGER_H
+#define PLUGINMANAGER_H
 #include "AutoPluginABI.h"
 #include "AutoPluginRegister.h"
 #include <iostream>
 #include "AutoPluginDef.h"
-#include "PluginInstallInfoMannager.h"
+#include "PluginInfoMannager.h"
 #include "ThreadPoolLockFree.h"
 
 class PluginManager {

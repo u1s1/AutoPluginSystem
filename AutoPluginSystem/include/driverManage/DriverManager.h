@@ -1,16 +1,16 @@
-#ifndef AUTOPLUGINDRIVERMANAGER_H
-#define AUTOPLUGINDRIVERMANAGER_H
+#ifndef DRIVERMANAGER_H
+#define DRIVERMANAGER_H
 #include "AutoPluginDriverAPI.h"
 #include <string>
 #include <iostream>
 #include "AutoPluginDef.h"
 
-class PluginDriverManager {
+class DriverManager {
 public:
     DriverDispatchTable m_driverTable;
 
-    PluginDriverManager();
-    ~PluginDriverManager();
+    DriverManager();
+    ~DriverManager();
 
     bool LoadAndStart(const char *pluginPath);
 

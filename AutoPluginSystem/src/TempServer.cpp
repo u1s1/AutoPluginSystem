@@ -3,14 +3,14 @@
 
 #include "AutoPluginABI.h"
 #include "AutoPluginRegister.h"
-#include "AutoPluginDriverManager.h"
+#include "DriverManager.h"
 #include <iostream>
 
 // 实现系统日志
 void AutoPluginLog(const char* message) {
     std::cout << "[Host System] " << message << std::endl;
 
-    PluginDriverManager driverManager;
+    DriverManager driverManager;
     if (driverManager.LoadAndStart("AutoPluginDriver.dll")) {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
