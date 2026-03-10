@@ -18,15 +18,17 @@ public:
     void Uninstall();
 
     //按路径加载临时外部插件
-    bool LoadAndStart(const char *pluginPath);
+    bool LoadByPath(const char *pluginPath);
 
+    bool Load(const char *pluginName);
     //启动已安装插件
-    bool Start(const char *pluginName);
+    bool Start();
 
     void Stop();
 
 private:
     LibHandle m_handle = nullptr;
+    PFN_StartPlugin m_startFunc = nullptr;
     PFN_StopPlugin m_stopFunc = nullptr;
     PFN_UninstallPlugin m_uninstallFunc = nullptr;
     ThreadPool m_threadPool{1}; // 线程池实例

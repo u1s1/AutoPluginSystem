@@ -10,6 +10,7 @@ PluginInfoMannager::PluginInfoMannager()
 
 PluginInfoMannager::~PluginInfoMannager()
 {
+    Save();
 }
 
 void PluginInfoMannager::Init()
