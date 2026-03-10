@@ -17,6 +17,7 @@
 #endif
 
 struct PluginInfo{
+    std::string id;
     std::string name;
     std::string version;
     std::string author;

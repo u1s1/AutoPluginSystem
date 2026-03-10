@@ -4,114 +4,106 @@
 #include "common.h"
 #include "InstallOperator.h"
 
-// 万能查询通道的具体实现
-void* QueryAPI(const char* apiName) {
-    auto& registry = GetApiRegistry();
-    auto it = registry.find(apiName);
-    return (it != registry.end()) ? it->second : nullptr;
-}
 
 PluginManager::PluginManager()
 {
+    auto pluginList = PluginInfoManager::GetPluginList();
+    for (const auto& pluginInfo : pluginList) {
+        m_mapInstance[pluginInfo.id] = nullptr;
+    }
 }
 PluginManager::~PluginManager()
 {
-    Stop();
+    for (auto& instance : m_mapInstance)
+    {
+        if (instance.second != nullptr)
+        {
+            instance.second->Unload();
+            instance.second.reset();
+        }
+    }
+    
 }
 
 bool PluginManager::Install(const char *pluginPath, bool allCopy)
 {
     PluginInfo pluginInfo;
-    if(!PluginInfoMannager::GetPluginInfoFromPath(pluginPath, pluginInfo))
+    if (InstallOperator::InstallPlugin(pluginPath, pluginInfo, allCopy) != 0)
     {
-        std::cout << "analysis failed" << std::endl;
-        return false; // 解析失败
-    }
-    
-    if (PluginInfoMannager::RegisterPluginInfo(pluginInfo) != 0)
-    {
-        std::cout << "register failed" << std::endl;
-        return false; // 注册失败
-    }
-
-    return InstallOperator::InstallPlugin(pluginPath, pluginInfo, allCopy) == 0;
-}
-
-void PluginManager::Uninstall()
-{
-    if (m_handle && m_stopFunc && m_uninstallFunc) {
-        m_stopFunc();
-        m_uninstallFunc();
-        CLOSE_LIB(m_handle);
-        m_handle = nullptr;
-    }
-    //下面执行删除插件文件及收尾操作
-    /* */
-    InstallOperator::UninstallPlugin(m_pluginInfo.name.c_str());
-    PluginInfoMannager::DeletePluginInfo(m_pluginInfo.name.c_str());
-    m_pluginInfo = PluginInfo(); // 重置插件信息
-}
-
-bool PluginManager::LoadByPath(const char *pluginPath)
-{
-    Stop();
-    m_handle = LOAD_LIB(pluginPath);
-    if (!m_handle) return false;
-
-    // 1. 获取三个核心入口点
-    auto setupFunc = (PFN_SetupPluginAPI)GET_FUNC(m_handle, "SetupPluginAPI");
-    m_startFunc = (PFN_StartPlugin)GET_FUNC(m_handle, "StartPlugin");
-    m_stopFunc = (PFN_StopPlugin)GET_FUNC(m_handle, "StopPlugin");
-    m_uninstallFunc = (PFN_UninstallPlugin)GET_FUNC(m_handle, "UninstallPlugin");
-
-    if (!setupFunc || !m_startFunc || !m_stopFunc || !m_uninstallFunc) {
-        CLOSE_LIB(m_handle);
         return false;
     }
+    getInstance().Unload(pluginInfo.id.c_str());
+    getInstance().m_mapInstance[pluginInfo.id] = nullptr; // 先注册一个空实例，等到 Load 时再创建真正的实例
+}
 
-    // 2. 注入系统的查询通道
-    setupFunc(QueryAPI);
+void PluginManager::Uninstall(const char *pluginID)
+{
+    if (getInstance().m_mapInstance.find(pluginID) == getInstance().m_mapInstance.end())
+    {
+        return;
+    }
+    getInstance().m_mapInstance[pluginID]->Unload();
+    getInstance().m_mapInstance[pluginID] = nullptr;
+    getInstance().m_mapInstance.erase(pluginID);
+    InstallOperator::UninstallPlugin(pluginID);
+}
 
+bool PluginManager::LoadByPath(const char *pluginID, const char *pluginPath)
+{
+    getInstance().Unload(pluginID);
+    getInstance().m_mapInstance[pluginID] = std::make_unique<PluginInstance>();
+    getInstance().m_mapInstance[pluginID]->LoadByPath(pluginPath);
     return true;
 }
 
-bool PluginManager::Load(const char *pluginName)
+bool PluginManager::Load(const char *pluginID)
 {
-    if(!PluginInfoMannager::GetPluginInfo(pluginName, m_pluginInfo))
-    {
-        return false; // 解析失败
-    }
-    std::string pluginPath = GetExecutablePath() + "/\\" + m_pluginInfo.name + "/\\" + m_pluginInfo.name + ".dll";
-    return LoadByPath(pluginPath.c_str());
-}
-
-bool PluginManager::Start()
-{
-    if (m_pluginInfo.name.empty())
+    if (getInstance().m_mapInstance.find(pluginID) == getInstance().m_mapInstance.end())
     {
         return false;
     }
-    
-    if (m_pluginInfo.running)
-    {
-        return true; // 已经在运行了
-    }
-    
-    std::string pluginPath = GetExecutablePath() + "/\\" + m_pluginInfo.name + "/\\" + m_pluginInfo.name + ".dll";
-    m_pluginInfo.running = true;
-    PluginInfoMannager::SetPluginInfo(m_pluginInfo);
-    // 3. 启动插件业务逻辑
-    m_startFunc();
-    return m_pluginInfo.running;
+    getInstance().Unload(pluginID);
+    getInstance().m_mapInstance[pluginID] = std::make_unique<PluginInstance>();
+    getInstance().m_mapInstance[pluginID]->Load(pluginID);
+    return true;
 }
 
-void PluginManager::Stop()
+bool PluginManager::Unload(const char *pluginID)
 {
-    if (m_handle && m_stopFunc) {
-        m_stopFunc();
-        CLOSE_LIB(m_handle);
-        m_handle = nullptr;
-        m_pluginInfo.running = false;
-        PluginInfoMannager::SetPluginInfo(m_pluginInfo);
+    if (getInstance().m_mapInstance.find(pluginID) == getInstance().m_mapInstance.end())
+    {
+        return true; //已经没有
     }
+    if (getInstance().m_mapInstance[pluginID] != nullptr)
+    {
+        getInstance().m_mapInstance[pluginID]->Unload();
+    }
+    getInstance().m_mapInstance[pluginID] = nullptr;
+    return true;
+}
+
+bool PluginManager::Start(const char *pluginID)
+{
+    if (getInstance().m_mapInstance.find(pluginID) == getInstance().m_mapInstance.end())
+    {
+        return false;
+    }
+    if (getInstance().m_mapInstance[pluginID] == nullptr)
+    {
+        return false;
+    }
+    return getInstance().m_mapInstance[pluginID]->Start();
+}
+
+void PluginManager::Stop(const char *pluginID)
+{
+    if (getInstance().m_mapInstance.find(pluginID) == getInstance().m_mapInstance.end())
+    {
+        return;
+    }
+    if (getInstance().m_mapInstance[pluginID] == nullptr)
+    {
+        return;
+    }
+    getInstance().m_mapInstance[pluginID]->Stop();
 }

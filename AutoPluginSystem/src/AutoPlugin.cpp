@@ -3,25 +3,28 @@
 int main()
 {
     std::cout << "Registered APIs count: " << GetApiRegistry().size() << std::endl;
-    PluginManager manager;
-    if (manager.Install("D:\\git\\AutoPluginSystem\\test\\Customer\\build\\Release\\MyPlugin.dll")) {
-        std::cout << "Plugin loaded and started successfully!" << std::endl;
+    if (PluginManager::Install("D:\\git\\AutoPluginSystem\\test\\Customer\\build\\Release\\MyPlugin.dll",false)) {
+        std::cout << "Plugin Install successfully!" << std::endl;
     } else {
-        std::cout << "Failed to load or start plugin." << std::endl;
+        std::cout << "Failed to Install plugin." << std::endl;
     }
-    manager.Load("MyPlugin");
-    if (manager.Start()) {
+    if (PluginManager::Load("com.MyPlugin")) {
+        std::cout << "Plugin  Load successfully!" << std::endl;
+    } else {
+        std::cout << "Failed to Load plugin." << std::endl;
+    }
+    if (PluginManager::Start("com.MyPlugin")) {
         std::cout << "Plugin  started successfully!" << std::endl;
     } else {
         std::cout << "Failed to start plugin." << std::endl;
     }
-    manager.Stop();
+    PluginManager::Stop("com.MyPlugin");
     std::cout << std::endl;
 
-    std::vector<PluginInfo> list = PluginInfoMannager::GetPluginList();
+    auto list = PluginInfoManager::GetPluginList();
     std::cout << "Installed plugins:" << std::endl;
     for (const auto& info : list) {
-        std::cout << " - " << info.name << " (version: " << info.version << ", author: " << info.author
+        std::cout << " - " << info.id << " (name: " << info.name<< ", version: " << info.version << ", author: " << info.author
         << ", description: " << info.description << ")" << std::endl;
     }
 

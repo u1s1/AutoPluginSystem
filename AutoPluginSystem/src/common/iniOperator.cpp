@@ -28,7 +28,7 @@ bool IniOperator::load(const std::string &filename)
 {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
+        std::cout << "Failed to open file: " << filename << std::endl;
         return false;
     }
     m_fileName = filename;
@@ -72,7 +72,7 @@ bool IniOperator::save()
 {
     std::ofstream file(m_fileName);
     if (!file.is_open()) {
-        std::cerr << "Failed to open file for writing: " << m_fileName << std::endl;
+        std::cout << "Failed to open file for writing: " << m_fileName << std::endl;
         return false;
     }
 
@@ -122,9 +122,10 @@ std::map<std::string, std::string> IniOperator::getSectionData(const std::string
 
 bool IniOperator::setSectionData(const PluginInfo &info)
 {
-    m_data[info.name]["version"] = info.version;
-    m_data[info.name]["author"] = info.author;
-    m_data[info.name]["description"] = info.description;
+    m_data[info.id]["name"] = info.name;
+    m_data[info.id]["version"] = info.version;
+    m_data[info.id]["author"] = info.author;
+    m_data[info.id]["description"] = info.description;
     m_isDirty = true;
     return true;
 }

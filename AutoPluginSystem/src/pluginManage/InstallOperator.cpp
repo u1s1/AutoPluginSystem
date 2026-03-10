@@ -3,9 +3,21 @@
 #include <iostream>
 #include "common.h"
 
-int InstallOperator::InstallPlugin(const char *pluginPath,const PluginInfo& pluginInfo, bool allCopy)
+int InstallOperator::InstallPlugin(const char *pluginPath, PluginInfo &pluginInfo, bool allCopy)
 {
-    std::string installDir = GetExecutablePath() + "/\\" + pluginInfo.name;
+    if(!PluginInfoManager::GetPluginInfoFromPath(pluginPath, pluginInfo))
+    {
+        std::cout << "analysis failed" << std::endl;
+        return 2; // 解析失败
+    }
+    
+    if (PluginInfoManager::RegisterPluginInfo(pluginInfo) != 0)
+    {
+        std::cout << "register failed" << std::endl;
+        return 3; // 注册失败
+    }
+
+    std::string installDir = GetExecutablePath() + "/\\" + pluginInfo.id;
     bool ret = false;
     if (allCopy)
     {
@@ -25,9 +37,10 @@ int InstallOperator::InstallPlugin(const char *pluginPath,const PluginInfo& plug
     return ret ? 0 : -1;
 }
 
-void InstallOperator::UninstallPlugin(const char *pluginName)
+void InstallOperator::UninstallPlugin(const char *pluginID)
 {
-    fs::path dirToRemove = GetExecutablePath() + "/\\" + pluginName;
+    PluginInfoManager::DeletePluginInfo(pluginID);
+    fs::path dirToRemove = GetExecutablePath() + "/\\" + pluginID;
     try {
         // remove_all 删除目录及其所有内容
         if (fs::exists(dirToRemove) && fs::is_directory(dirToRemove)) {
