@@ -1,7 +1,7 @@
 #ifndef PLUGININSTALLINFOMANAGER_H
 #define PLUGININSTALLINFOMANAGER_H
 
-#include <map>
+#include <unordered_map>
 #include "AutoPluginDef.h"
 
 class PluginInstallInfoMannager{
@@ -24,13 +24,15 @@ private:
 
     void Init();
 
+    void Save();
+
     static PluginInstallInfoMannager& getInstance()
     {
         static PluginInstallInfoMannager instance;
         return instance;
     }
 
-    std::map<std::string, PluginInfo> m_mapPluginInfo;
+    std::unordered_map<std::string, PluginInfo> m_mapPluginInfo;
 };
 
 #endif

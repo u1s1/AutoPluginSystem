@@ -71,13 +71,7 @@ bool PluginManager::LoadAndStart(const char *pluginPath)
     setupFunc(QueryAPI);
 
     // 3. 启动插件业务逻辑
-    m_threadPool.PushThread([this, startFunc]() {
-        if (!startFunc()) {
-            std::cerr << "Plugin failed to start." << std::endl;
-            return;
-        }
-        this->Stop();
-    });
+    startFunc();
 
     return true;
 }

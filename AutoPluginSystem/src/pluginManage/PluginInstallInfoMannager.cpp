@@ -1,6 +1,6 @@
 #include "PluginInstallInfoMannager.h"
 #include "common.h"
-#include "IniReader.h"
+#include "IniOperator.h"
 
 
 PluginInstallInfoMannager::PluginInstallInfoMannager()
@@ -17,12 +17,11 @@ void PluginInstallInfoMannager::Init()
     //解析配置文件，填充 m_mapPluginInfo
     m_mapPluginInfo.clear();
 
-    IniReader reader;
+    IniOperator reader;
     std::string configFilePath = GetExecutablePath() + "/plugin_info.ini"; // 假设配置文件路径固定
     if (reader.load(configFilePath)) {
         auto sections = reader.getSections();
         for (const auto& section : sections) {
-            auto sectionData = reader.getSectionData(section);
             PluginInfo info;
             info.name = section;
             info.description = reader.getValue(section, "description", "");
@@ -34,6 +33,14 @@ void PluginInstallInfoMannager::Init()
     }
 }
 
+void PluginInstallInfoMannager::Save()
+{
+    IniOperator writer(GetExecutablePath() + "/plugin_info.ini");
+    for (const auto& pair : getInstance().m_mapPluginInfo) {
+        writer.setSectionData(pair.second);
+    }
+    writer.save();
+}
 
 bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, PluginInfo & info)
 {
@@ -43,9 +50,9 @@ bool PluginInstallInfoMannager::GetPluginInfoFromPath(const char * pluginPath, P
         return false; // 无效路径
     }
     strPluginPath = strPluginPath.substr(0, lastSlash + 1); // 获取目录
-    std::string configFilePath = strPluginPath + "plugin.config"; // 假设配置文件名固定
+    std::string configFilePath = strPluginPath + "plugin_info.ini"; // 假设配置文件名固定
     // 解析 configFilePath，填充 info
-    IniReader reader;
+    IniOperator reader;
     if (reader.load(configFilePath)) {
         auto sections = reader.getSections();
         if (sections.empty())
@@ -67,24 +74,33 @@ int PluginInstallInfoMannager::RegisterPluginInfo(const PluginInfo & info)
 {
     if (info.name.empty())
     {
-        return 3;
+        return 3; //待安装插件信息为空
     }
     if (getInstance().m_mapPluginInfo.find(info.name) != getInstance().m_mapPluginInfo.end())
     {
-        return 1; // 已存在同名插件
+        if (getInstance().m_mapPluginInfo[info.name].author != info.author)
+        {
+            return 4; // 已存在同名插件但作者不同
+        }
+        
+        if (getInstance().m_mapPluginInfo[info.name].version >= info.version)
+        {
+            return 2; // 已存在同名插件且版本不低于当前版本
+        }
     }
 
     getInstance().m_mapPluginInfo[info.name] = info;
     //接下来保存新信息到配置文件
+    getInstance().Save();
 
     return 0; // 注册成功
 }
 
 bool PluginInstallInfoMannager::GetPluginInfo(const char *pluginName, PluginInfo &info)
 {
-    if (info.name.empty())
+    if (pluginName == nullptr || std::string(pluginName).empty())
     {
-        return 3;
+        return false;
     }
     if (getInstance().m_mapPluginInfo.find(pluginName) == getInstance().m_mapPluginInfo.end())
     {
@@ -107,6 +123,7 @@ bool PluginInstallInfoMannager::SetPluginInfo(const PluginInfo & info)
     }
     getInstance().m_mapPluginInfo[info.name] = info;
     //接下来保存新信息到配置文件
+    getInstance().Save();
     
     return true;
 }
@@ -121,9 +138,9 @@ bool PluginInstallInfoMannager::DeletePluginInfo(const char * pluginName)
     {
         return true; // 已经不存在了
     }
-    //接下来保存已经删除插件的新信息到配置文件
-
-    
     getInstance().m_mapPluginInfo.erase(pluginName);
+    //接下来保存已经删除插件的新信息到配置文件
+    getInstance().Save();
+    
     return true;
 }

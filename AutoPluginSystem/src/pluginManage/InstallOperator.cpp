@@ -9,7 +9,14 @@ int InstallOperator::InstallPlugin(const char *pluginPath,const PluginInfo& plug
     bool ret = false;
     if (allCopy)
     {
-        ret = copy_directory_recursive(pluginPath, installDir);
+        std::string strPluginPath(pluginPath);
+        size_t lastSlash = strPluginPath.find_last_of("/\\");
+        if (lastSlash == std::string::npos) {
+            return -1; // 无效路径
+        }
+        strPluginPath = strPluginPath.substr(0, lastSlash); // 获取目录
+        std::cout<< "Plugin directory: " << strPluginPath << std::endl;
+        ret = copy_directory_recursive(strPluginPath, installDir);
     }
     else
     {
