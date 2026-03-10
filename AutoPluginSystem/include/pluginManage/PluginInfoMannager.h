@@ -18,6 +18,8 @@ public:
 
     static bool DeletePluginInfo(const char *pluginName);
 
+    static std::vector<PluginInfo> GetPluginList();
+
 private:
     PluginInfoMannager();
     ~PluginInfoMannager();

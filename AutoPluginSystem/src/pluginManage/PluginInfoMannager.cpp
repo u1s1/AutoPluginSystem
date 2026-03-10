@@ -145,3 +145,12 @@ bool PluginInfoMannager::DeletePluginInfo(const char * pluginName)
     
     return true;
 }
+
+std::vector<PluginInfo> PluginInfoMannager::GetPluginList()
+{
+    std::vector<PluginInfo> pluginList;
+    for (const auto& pair : getInstance().m_mapPluginInfo) {
+        pluginList.push_back(pair.second);
+    }
+    return pluginList;
+}
