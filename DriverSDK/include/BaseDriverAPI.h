@@ -10,7 +10,6 @@
 
 // 强制所有驱动表遵循的内存前缀契约
 struct DriverHeader {
-    uint32_t magicId;    // 唯一魔数，代表驱动的具体业务类型（如 0x00 代表网络驱动）
     uint32_t version;    // 驱动 API 版本号，用于向后兼容检查
     uint32_t tableSize;  // 结构体总字节数，防止新版宿主读取老版 DLL 导致内存越界
 };

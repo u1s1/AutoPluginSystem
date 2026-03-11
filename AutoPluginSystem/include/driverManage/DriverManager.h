@@ -6,6 +6,7 @@
 #include <mutex>
 #include <memory>
 #include <unordered_map>
+#include <typeindex>
 #include "AutoPluginDef.h"
 
 #define LOW_SUPPORT_VERSION 1
@@ -30,7 +31,7 @@ struct DriverContext {
 class DriverManager {
 private:
     std::mutex m_mutex;
-    std::unordered_map<uint32_t, std::shared_ptr<DriverContext>> m_drivers;
+    std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> m_drivers;
 
 public:
     DriverManager();
@@ -38,7 +39,7 @@ public:
 
     // 模板化加载：宿主调用时必须指明期望的表类型 TTable
     template <typename TTable>
-    bool LoadAndStart(const uint32_t& driverId, const char* pluginPath, uint32_t minVersion) {
+    bool LoadAndStart(const char* pluginPath, uint32_t minVersion) {
         auto context = std::make_shared<DriverContext>();
         context->handle = LOAD_LIB(pluginPath);
         if (!context->handle) return false;
@@ -56,29 +57,50 @@ public:
         if (!loadDriver(pTable.get())) return false;
 
         // 核心安全层：跨 DLL 的 API 版本控制与越界校验
-        if (pTable->header.magicId != driverId) return false;
         if (pTable->header.version < minVersion) return false;
         if (pTable->header.tableSize > sizeof(TTable)) return false; // 防止驱动写爆内存
 
         // 将特定类型的智能指针向上转型为 void*，存入统一容器 (类型擦除)
         context->table = pTable;
-        Unload(driverId);
+        Unload<TTable>();
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_drivers[driverId] = std::move(context);
+        m_drivers[std::type_index(typeid(TTable))] = std::move(context);
         return true;
     }
 
-    void Unload(const uint32_t& driverId);
+    template <typename TTable>
+    void Unload()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_drivers[std::type_index(typeid(TTable))].reset();
+    }
 
     void UnloadAll();
 
-    void Uninstall(const uint32_t& driverId);
+    template <typename TTable>
+    void Uninstall()
+    {
+        std::shared_ptr<DriverContext> tempContext = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            tempContext = m_drivers[std::type_index(typeid(TTable))];
+            m_drivers[std::type_index(typeid(TTable))].reset();
+        }
+        if (tempContext != nullptr && tempContext->uninstallFunc != nullptr)
+        {
+            tempContext->uninstallFunc();
+        }
+        tempContext.reset();
+
+        //下面执行删除驱动文件及收尾操作
+        /* */
+    }
 
     // 工作线程安全获取驱动表
     template <typename TTable>
-    std::shared_ptr<const TTable> GetDriverTable(const uint32_t& driverId) {
+    std::shared_ptr<const TTable> GetDriverTable() {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto it = m_drivers.find(driverId);
+        auto it = m_drivers.find(std::type_index(typeid(TTable)));
         if (it == m_drivers.end() || !it->second->table) return nullptr;
         
         // 智能指针别名构造技术：返回特定类型的指针，但引用计数依然绑定在 context 上
