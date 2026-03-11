@@ -56,6 +56,8 @@ void PluginInstance::Unload()
         CLOSE_LIB(m_handle);
         m_handle = nullptr;
     }
+    m_startFunc = nullptr;
+    m_stopFunc = nullptr;
 }
 
 bool PluginInstance::Start()
