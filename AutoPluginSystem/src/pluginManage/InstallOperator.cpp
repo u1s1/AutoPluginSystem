@@ -3,7 +3,7 @@
 #include <iostream>
 #include "common.h"
 
-int InstallOperator::InstallPlugin(const char *pluginPath, PluginInfo &pluginInfo, bool allCopy)
+int InstallOperator::InstallPlugin(const std::string& pluginPath, PluginInfo &pluginInfo, bool allCopy)
 {
     if(!PluginInfoManager::GetPluginInfoFromPath(pluginPath, pluginInfo))
     {
@@ -37,7 +37,7 @@ int InstallOperator::InstallPlugin(const char *pluginPath, PluginInfo &pluginInf
     return ret ? 0 : -1;
 }
 
-void InstallOperator::UninstallPlugin(const char *pluginID)
+void InstallOperator::UninstallPlugin(const std::string& pluginID)
 {
     PluginInfoManager::DeletePluginInfo(pluginID);
     fs::path dirToRemove = GetExecutablePath() + "/\\" + pluginID;

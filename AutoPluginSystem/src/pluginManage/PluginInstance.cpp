@@ -17,10 +17,10 @@ PluginInstance::~PluginInstance()
     Unload();
 }
 
-bool PluginInstance::LoadByPath(const char *pluginPath)
+bool PluginInstance::LoadByPath(const std::string& pluginPath)
 {
     Unload();
-    m_handle = LOAD_LIB(pluginPath);
+    m_handle = LOAD_LIB(pluginPath.c_str());
     if (!m_handle) return false;
 
     // 1. 获取三个核心入口点
@@ -39,7 +39,7 @@ bool PluginInstance::LoadByPath(const char *pluginPath)
     return true;
 }
 
-bool PluginInstance::Load(const char *pluginId)
+bool PluginInstance::Load(const std::string& pluginId)
 {
     if(!PluginInfoManager::GetPluginInfo(pluginId, m_pluginInfo))
     {

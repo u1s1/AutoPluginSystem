@@ -45,7 +45,7 @@ void PluginInfoManager::Save()
     writer.save();
 }
 
-bool PluginInfoManager::GetPluginInfoFromPath(const char * pluginPath, PluginInfo & info)
+bool PluginInfoManager::GetPluginInfoFromPath(const std::string&  pluginPath, PluginInfo & info)
 {
     std::string strPluginPath(pluginPath);
     size_t lastSlash = strPluginPath.find_last_of("/\\");
@@ -101,9 +101,9 @@ int PluginInfoManager::RegisterPluginInfo(const PluginInfo & info)
     return 0; // 注册成功
 }
 
-bool PluginInfoManager::GetPluginInfo(const char *pluginID, PluginInfo &info)
+bool PluginInfoManager::GetPluginInfo(const std::string& pluginID, PluginInfo &info)
 {
-    if (pluginID == nullptr || std::string(pluginID).empty())
+    if (pluginID.empty())
     {
         return false;
     }
@@ -133,9 +133,9 @@ bool PluginInfoManager::SetPluginInfo(const PluginInfo & info)
     return true;
 }
 
-bool PluginInfoManager::DeletePluginInfo(const char * pluginID)
+bool PluginInfoManager::DeletePluginInfo(const std::string&  pluginID)
 {
-    if (pluginID == nullptr || std::string(pluginID).empty())
+    if (pluginID.empty())
     {
         return 3;
     }

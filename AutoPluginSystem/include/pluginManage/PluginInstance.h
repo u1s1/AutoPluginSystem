@@ -14,9 +14,9 @@ public:
     ~PluginInstance();
 
     //按路径加载临时外部插件
-    bool LoadByPath(const char *pluginPath);
+    bool LoadByPath(const std::string& pluginPath);
 
-    bool Load(const char *pluginId);
+    bool Load(const std::string& pluginId);
 
     void Unload();
     //启动已安装插件

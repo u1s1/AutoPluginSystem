@@ -7,16 +7,16 @@
 class PluginInfoManager{
 public:
     //从插件路径下自带的配置文件解析出插件信息
-    static bool GetPluginInfoFromPath(const char *pluginPath, PluginInfo &info);
+    static bool GetPluginInfoFromPath(const std::string& pluginPath, PluginInfo &info);
 
     // 注册插件信息并创建插件文件夹，返回值：0成功，1已存在同名插件，2创建安装目录失败
     static int RegisterPluginInfo(const PluginInfo &info);
 
-    static bool GetPluginInfo(const char *pluginID, PluginInfo &info);
+    static bool GetPluginInfo(const std::string& pluginID, PluginInfo &info);
 
     static bool SetPluginInfo(const PluginInfo &info);
 
-    static bool DeletePluginInfo(const char *pluginID);
+    static bool DeletePluginInfo(const std::string& pluginID);
 
     static std::vector<PluginInfo> GetPluginList();
 
