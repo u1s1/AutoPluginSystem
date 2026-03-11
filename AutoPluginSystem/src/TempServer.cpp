@@ -14,8 +14,8 @@ void AutoPluginLog(const char* message) {
     if (driverManager.LoadAndStart("AutoPluginDriver.dll")) {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
-        int device = driverManager.m_driverTable.CreateDevice();
-        driverManager.m_driverTable.DestroyDevice(device);
+        int device = driverManager.GetDriverTable()->CreateDevice();
+        driverManager.GetDriverTable()->DestroyDevice(device);
         driverManager.Unload();
     } else {
         std::cout << "Failed to load or start driver." << std::endl;
@@ -24,8 +24,8 @@ void AutoPluginLog(const char* message) {
     if (driverManager.LoadAndStart("AutoPluginDriver.dll")) {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
-        int device = driverManager.m_driverTable.CreateDevice();
-        driverManager.m_driverTable.DestroyDevice(device);
+        int device = driverManager.GetDriverTable()->CreateDevice();
+        driverManager.GetDriverTable()->DestroyDevice(device);
         driverManager.Uninstall();
     } else {
         std::cout << "Failed to load or start driver." << std::endl;

@@ -3,12 +3,31 @@
 #include "AutoPluginDriverAPI.h"
 #include <string>
 #include <iostream>
+#include <mutex>
+#include <memory>
 #include "AutoPluginDef.h"
+
+#define LOW_SUPPORT_VERSION 1
+
+struct DriverContext {
+    LibHandle handle = nullptr;
+    DriverDispatchTable table{};
+    PFN_StopDriver stopFunc = nullptr;
+    PFN_UninstallDriver uninstallFunc = nullptr;
+
+    // 析构函数：当最后一个 shared_ptr 被销毁时触发
+    ~DriverContext() {
+        if (handle) {
+            if (stopFunc) {
+                stopFunc(); // 停止业务逻辑
+            }
+            CLOSE_LIB(handle); // 安全卸载 DLL
+        }
+    }
+};
 
 class DriverManager {
 public:
-    DriverDispatchTable m_driverTable;
-
     DriverManager();
     ~DriverManager();
 
@@ -18,10 +37,11 @@ public:
 
     void Uninstall();
 
+    std::shared_ptr<const DriverDispatchTable> GetDriverTable();
+
 private:
-    LibHandle m_handle = nullptr;
-    PFN_StopDriver m_stopFunc = nullptr;
-    PFN_UninstallDriver m_uninstallFunc = nullptr;
+    std::mutex m_mutex;
+    std::shared_ptr<DriverContext> m_context;
 };
 
 #endif
