@@ -3,22 +3,23 @@
 int main()
 {
     std::cout << "Registered APIs count: " << GetApiRegistry().size() << std::endl;
-    if (PluginManager::Install("D:\\git\\AutoPluginSystem\\test\\Customer\\build\\Release\\MyPlugin.dll",false)) {
+    PluginManager manager;
+    if (manager.Install("D:\\git\\AutoPluginSystem\\test\\Customer\\build\\Release\\MyPlugin.dll",false)) {
         std::cout << "Plugin Install successfully!" << std::endl;
     } else {
         std::cout << "Failed to Install plugin." << std::endl;
     }
-    if (PluginManager::Load("com.MyPlugin")) {
+    if (manager.Load("com.MyPlugin")) {
         std::cout << "Plugin  Load successfully!" << std::endl;
     } else {
         std::cout << "Failed to Load plugin." << std::endl;
     }
-    if (PluginManager::Start("com.MyPlugin")) {
+    if (manager.Start("com.MyPlugin")) {
         std::cout << "Plugin  started successfully!" << std::endl;
     } else {
         std::cout << "Failed to start plugin." << std::endl;
     }
-    PluginManager::Stop("com.MyPlugin");
+    manager.Stop("com.MyPlugin");
     std::cout << std::endl;
 
     auto list = PluginInfoManager::GetPluginList();
