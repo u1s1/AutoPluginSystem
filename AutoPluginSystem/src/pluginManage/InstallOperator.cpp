@@ -3,15 +3,24 @@
 #include <iostream>
 #include "common.h"
 
-int InstallOperator::InstallPlugin(const std::string& pluginPath, PluginInfo &pluginInfo, bool allCopy)
+InstallOperator::InstallOperator(std::shared_ptr<PluginInfoManager> infoManager) : 
+    m_infoManager(infoManager)
 {
-    if(!PluginInfoManager::GetPluginInfoFromPath(pluginPath, pluginInfo))
+}
+
+InstallOperator::~InstallOperator()
+{
+}
+
+int InstallOperator::InstallPlugin(const std::string &pluginPath, PluginInfo &pluginInfo, bool allCopy)
+{
+    if(!m_infoManager->GetPluginInfoFromPath(pluginPath, pluginInfo))
     {
         std::cout << "analysis failed" << std::endl;
         return 2; // 解析失败
     }
     
-    if (PluginInfoManager::RegisterPluginInfo(pluginInfo) != 0)
+    if (m_infoManager->RegisterPluginInfo(pluginInfo) != 0)
     {
         std::cout << "register failed" << std::endl;
         return 3; // 注册失败
@@ -39,7 +48,7 @@ int InstallOperator::InstallPlugin(const std::string& pluginPath, PluginInfo &pl
 
 void InstallOperator::UninstallPlugin(const std::string& pluginID)
 {
-    PluginInfoManager::DeletePluginInfo(pluginID);
+    m_infoManager->DeletePluginInfo(pluginID);
     fs::path dirToRemove = GetExecutablePath() + "/\\" + pluginID;
     try {
         // remove_all 删除目录及其所有内容

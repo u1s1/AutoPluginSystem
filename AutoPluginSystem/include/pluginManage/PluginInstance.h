@@ -10,7 +10,7 @@
 
 class PluginInstance {
 public:
-    PluginInstance();
+    PluginInstance(std::shared_ptr<PluginInfoManager> infoManager);
     ~PluginInstance();
 
     //按路径加载临时外部插件
@@ -28,6 +28,7 @@ private:
     PFN_StartPlugin m_startFunc = nullptr;
     PFN_StopPlugin m_stopFunc = nullptr;
     PluginInfo m_pluginInfo;
+    std::shared_ptr<PluginInfoManager> m_infoManager;
 };
 
 #endif

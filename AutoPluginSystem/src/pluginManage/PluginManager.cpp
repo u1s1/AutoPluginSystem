@@ -4,10 +4,12 @@
 #include "common.h"
 #include "InstallOperator.h"
 
-
-PluginManager::PluginManager()
+PluginManager::PluginManager(std::unique_ptr<IPluginInstaller> installer, 
+    std::shared_ptr<PluginInfoManager> infoManager) : 
+    m_installer(std::move(installer)),
+    m_infoManager(infoManager)
 {
-    auto pluginList = PluginInfoManager::GetPluginList();
+    auto pluginList = m_infoManager->GetPluginList();
     for (const auto& pluginInfo : pluginList) {
         m_mapInstance[pluginInfo.id] = nullptr;
     }
@@ -29,7 +31,7 @@ PluginManager::~PluginManager()
 bool PluginManager::Install(const std::string& pluginPath, bool allCopy)
 {
     PluginInfo pluginInfo;
-    if (InstallOperator::InstallPlugin(pluginPath, pluginInfo, allCopy) != 0)
+    if (m_installer->InstallPlugin(pluginPath, pluginInfo, allCopy) != 0)
     {
         return false;
     }
@@ -41,25 +43,27 @@ bool PluginManager::Install(const std::string& pluginPath, bool allCopy)
 
 void PluginManager::Uninstall(const std::string& pluginID)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_mapInstance.find(pluginID) == m_mapInstance.end())
     {
-        return;
+        std::lock_guard<std::mutex> lock(m_mutex);
+        auto it = m_mapInstance.find(pluginID);
+        if (it == m_mapInstance.end())
+        {
+            return;
+        }
+        if (it->second != nullptr)
+        {
+           it->second->Unload();
+        }
+        m_mapInstance.erase(it);
     }
-    if (m_mapInstance[pluginID] != nullptr)
-    {
-        m_mapInstance[pluginID]->Unload();
-    }
-    m_mapInstance[pluginID] = nullptr;
-    m_mapInstance.erase(pluginID);
-    InstallOperator::UninstallPlugin(pluginID);
+    m_installer->UninstallPlugin(pluginID);
 }
 
 bool PluginManager::LoadByPath(const std::string& pluginID, const std::string& pluginPath)
 {
     Unload(pluginID);
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_mapInstance[pluginID] = std::make_shared<PluginInstance>();
+    m_mapInstance[pluginID] = std::make_shared<PluginInstance>(m_infoManager);
     m_mapInstance[pluginID]->LoadByPath(pluginPath);
     return true;
 }
@@ -75,7 +79,7 @@ bool PluginManager::Load(const std::string& pluginID)
     }
     Unload(pluginID);
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_mapInstance[pluginID] = std::make_shared<PluginInstance>();
+    m_mapInstance[pluginID] = std::make_shared<PluginInstance>(m_infoManager);
     m_mapInstance[pluginID]->Load(pluginID);
     return true;
 }

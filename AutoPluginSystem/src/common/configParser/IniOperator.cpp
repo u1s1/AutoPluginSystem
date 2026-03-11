@@ -26,6 +26,7 @@ IniOperator::~IniOperator()
 
 bool IniOperator::load(const std::string &filename)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cout << "Failed to open file: " << filename << std::endl;
@@ -70,6 +71,7 @@ bool IniOperator::load(const std::string &filename)
 
 bool IniOperator::save()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::ofstream file(m_fileName);
     if (!file.is_open()) {
         std::cout << "Failed to open file for writing: " << m_fileName << std::endl;
@@ -97,13 +99,15 @@ bool IniOperator::save()
 
 bool IniOperator::replaceAllData(const std::map<std::string, std::map<std::string, std::string>> &newData)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_data = newData;
     m_isDirty = true;
     return true;
 }
 
-std::vector<std::string> IniOperator::getAllSections() const
+std::vector<std::string> IniOperator::getAllSections()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::vector<std::string> sections;
     for (const auto& pair : m_data) {
         sections.push_back(pair.first);
@@ -111,8 +115,9 @@ std::vector<std::string> IniOperator::getAllSections() const
     return sections;
 }
 
-std::map<std::string, std::string> IniOperator::getSectionData(const std::string &section) const
+std::map<std::string, std::string> IniOperator::getSectionData(const std::string &section)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_data.find(section);
     if (it != m_data.end()) {
         return it->second;
@@ -122,6 +127,7 @@ std::map<std::string, std::string> IniOperator::getSectionData(const std::string
 
 bool IniOperator::setSectionData(const PluginInfo &info)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_data[info.id]["name"] = info.name;
     m_data[info.id]["version"] = info.version;
     m_data[info.id]["author"] = info.author;
@@ -130,8 +136,9 @@ bool IniOperator::setSectionData(const PluginInfo &info)
     return true;
 }
 
-std::string IniOperator::getValue(const std::string &section, const std::string &key, const std::string &defaultValue) const
+std::string IniOperator::getValue(const std::string &section, const std::string &key, const std::string &defaultValue)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     auto secIt = m_data.find(section);
     if (secIt != m_data.end()) {
         auto keyIt = secIt->second.find(key);
@@ -144,6 +151,7 @@ std::string IniOperator::getValue(const std::string &section, const std::string 
 
 bool IniOperator::setValue(const std::string &section, const std::string &key, const std::string &value)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_data[section][key] = value;
     m_isDirty = true;
     return true;

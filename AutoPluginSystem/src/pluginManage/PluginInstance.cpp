@@ -8,7 +8,8 @@ void* QueryAPI(const char* apiName) {
     return (it != registry.end()) ? it->second : nullptr;
 }
 
-PluginInstance::PluginInstance()
+PluginInstance::PluginInstance(std::shared_ptr<PluginInfoManager> infoManager) : 
+    m_infoManager(infoManager)
 {
 }
 
@@ -41,7 +42,7 @@ bool PluginInstance::LoadByPath(const std::string& pluginPath)
 
 bool PluginInstance::Load(const std::string& pluginId)
 {
-    if(!PluginInfoManager::GetPluginInfo(pluginId, m_pluginInfo))
+    if(!m_infoManager->GetPluginInfo(pluginId, m_pluginInfo))
     {
         return false; // 解析失败
     }
@@ -78,7 +79,7 @@ bool PluginInstance::Start()
     
     std::string pluginPath = GetExecutablePath() + "/\\" + m_pluginInfo.id + "/\\" + m_pluginInfo.name + ".dll";
     m_pluginInfo.running = true;
-    PluginInfoManager::SetPluginInfo(m_pluginInfo);
+    m_infoManager->SetPluginInfo(m_pluginInfo, false);
     // 3. 启动插件业务逻辑
     m_startFunc();
     return m_pluginInfo.running;
@@ -89,6 +90,6 @@ void PluginInstance::Stop()
     if (m_handle && m_stopFunc) {
         m_stopFunc();
         m_pluginInfo.running = false;
-        PluginInfoManager::SetPluginInfo(m_pluginInfo);
+        m_infoManager->SetPluginInfo(m_pluginInfo, false);
     }
 }

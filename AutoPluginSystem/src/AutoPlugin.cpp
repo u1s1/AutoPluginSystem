@@ -1,9 +1,12 @@
 #include "PluginManager.h"
+#include "InstallOperator.h"
+#include "IniOperator.h"
 
 int main()
 {
     std::cout << "Registered APIs count: " << GetApiRegistry().size() << std::endl;
-    PluginManager manager;
+    std::shared_ptr<PluginInfoManager> infoManager = std::make_shared<PluginInfoManager>(std::make_unique<IniOperator>());
+    PluginManager manager(std::make_unique<InstallOperator>(infoManager), infoManager);
     if (manager.Install("D:\\git\\AutoPluginSystem\\test\\Customer\\build\\Release\\MyPlugin.dll",false)) {
         std::cout << "Plugin Install successfully!" << std::endl;
     } else {
@@ -22,7 +25,7 @@ int main()
     manager.Stop("com.MyPlugin");
     std::cout << std::endl;
 
-    auto list = PluginInfoManager::GetPluginList();
+    auto list = infoManager->GetPluginList();
     std::cout << "Installed plugins:" << std::endl;
     for (const auto& info : list) {
         std::cout << " - " << info.id << " (name: " << info.name<< ", version: " << info.version << ", author: " << info.author
