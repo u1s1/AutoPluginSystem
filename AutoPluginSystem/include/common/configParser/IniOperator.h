@@ -8,8 +8,10 @@
 #include <vector>
 #include <algorithm>
 #include "AutoPluginDef.h"
+#include "IConfigParser.h"
 
-class IniOperator {
+class IniOperator :public IConfigParser
+{
 private:
     std::string m_fileName;
     bool m_isDirty;
@@ -23,24 +25,24 @@ public:
     IniOperator(const std::string &filename = "");
     ~IniOperator();
     // 加载并解析 INI 文件
-    bool load(const std::string &filename);
+    bool load(const std::string &filename) override;
 
-    bool save();
+    bool save() override;
 
-    bool replaceOldData(const std::map<std::string, std::map<std::string, std::string>>& newData);
+    bool replaceAllData(const std::map<std::string, std::map<std::string, std::string>>& newData) override;
 
     // 获取动态读取到的所有 Section 名称
-    std::vector<std::string> getSections() const;
+    std::vector<std::string> getAllSections() const override;
 
     // 获取特定 Section 下的所有键值对
-    std::map<std::string, std::string> getSectionData(const std::string &section) const;
+    std::map<std::string, std::string> getSectionData(const std::string &section) const override;
 
-    bool setSectionData(const PluginInfo &info);
+    bool setSectionData(const PluginInfo &info) override;
 
     // 获取具体的某一个值 (带默认值保护)
-    std::string getValue(const std::string &section, const std::string &key, const std::string &defaultValue = "") const;
+    std::string getValue(const std::string &section, const std::string &key, const std::string &defaultValue = "") const override;
 
-    bool setValue(const std::string &section, const std::string &key, const std::string &value);
+    bool setValue(const std::string &section, const std::string &key, const std::string &value) override;
 };
 
 #endif

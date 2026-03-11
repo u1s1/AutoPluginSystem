@@ -95,14 +95,14 @@ bool IniOperator::save()
     return true;
 }
 
-bool IniOperator::replaceOldData(const std::map<std::string, std::map<std::string, std::string>> &newData)
+bool IniOperator::replaceAllData(const std::map<std::string, std::map<std::string, std::string>> &newData)
 {
     m_data = newData;
     m_isDirty = true;
     return true;
 }
 
-std::vector<std::string> IniOperator::getSections() const
+std::vector<std::string> IniOperator::getAllSections() const
 {
     std::vector<std::string> sections;
     for (const auto& pair : m_data) {

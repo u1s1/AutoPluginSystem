@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 提示：如果你的源文件很多，可以使用 file(GLOB SOURCES "src/*.cpp")，但直接列出更利于维护
 file(GLOB_RECURSE HOST_SOURCES "src/*.cpp")
 file(GLOB_RECURSE PLUGIN_SOURCES "src/common/*.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/common/configParser/*.cpp")
 file(GLOB_RECURSE PLUGIN_SOURCES "src/pluginManage/*.cpp")
 file(GLOB_RECURSE DRIVER_SOURCES "src/driverManage/*.cpp")
 
@@ -20,6 +21,7 @@ add_executable(HostMain ${HOST_SOURCES} ${PLUGIN_SOURCES} ${DRIVER_SOURCES})
 target_include_directories(HostMain PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/common/configParser
     ${CMAKE_CURRENT_SOURCE_DIR}/include/threadpool
     ${CMAKE_CURRENT_SOURCE_DIR}/include/pluginManage
     ${CMAKE_CURRENT_SOURCE_DIR}/include/driverManage

@@ -21,7 +21,7 @@ void PluginInfoManager::Init()
     IniOperator reader;
     std::string configFilePath = GetExecutablePath() + "/plugin_info.ini"; // 假设配置文件路径固定
     if (reader.load(configFilePath)) {
-        auto sections = reader.getSections();
+        auto sections = reader.getAllSections();
         for (const auto& section : sections) {
             PluginInfo info;
             info.id = section;
@@ -59,7 +59,7 @@ bool PluginInfoManager::GetPluginInfoFromPath(const std::string&  pluginPath, Pl
     if (!reader.load(configFilePath)) {
         return false;
     }
-    auto sections = reader.getSections();
+    auto sections = reader.getAllSections();
     if (sections.empty())
     {
         return false;
