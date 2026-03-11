@@ -1,7 +1,7 @@
 .vscode/*
 build/*
 AutoPluginSystem/build/*
-CustomerSDK/build/*
+PluginSDK/build/*
 DriverSDK/build/*
 test/Customer/build/*
 test/System/build/*
