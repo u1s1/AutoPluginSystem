@@ -1,9 +1,7 @@
 #include "DriverManager.h"
 
-DriverManager::DriverManager(std::shared_ptr<DriverInfoManager> infoManager,
-                  std::shared_ptr<SystemDriverRequireInfoManager> systemRequire) :
-    m_infoManager(infoManager),
-    m_systemRequire(systemRequire)
+DriverManager::DriverManager(std::shared_ptr<DriverLoader> loader) :
+    m_loader(loader)
 {
 }
 

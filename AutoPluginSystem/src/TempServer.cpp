@@ -12,8 +12,10 @@
 void AutoPluginLog(const char* message) {
     std::cout << "[Host System] " << message << std::endl;
 
-    DriverManager driverManager(std::make_shared<DriverInfoManager>(std::make_unique<IniOperator>()),
-                                std::make_shared<SystemDriverRequireInfoManager>(std::make_unique<IniOperator>()));
+    std::shared_ptr<DriverLoader> loader = std::make_shared<DriverLoader>(
+        std::make_shared<DriverInfoManager>(std::make_unique<IniOperator>()),
+        std::make_shared<SystemDriverRequireInfoManager>(std::make_unique<IniOperator>()));
+    DriverManager driverManager(loader);
     if (driverManager.LoadByPath<DriverDispatchTable>( "AutoPluginDriver.dll", 1))
     {
         std::cout << "Driver loaded and started successfully!" << std::endl;

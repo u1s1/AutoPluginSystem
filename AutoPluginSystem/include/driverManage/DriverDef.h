@@ -1,6 +1,8 @@
 #ifndef DRIVER_DEF_H
 #define DRIVER_DEF_H
 #include <string>
+#include "BaseDriverAPI.h"
+#include <memory>
 
 #if defined(_WIN32)
     #include <windows.h>
@@ -25,6 +27,23 @@ struct DriverInfo{
     std::string description;
     bool running = false;
     bool defaultLoad = false;
+};
+
+struct DriverContext {
+    LibHandle handle = nullptr;
+    std::shared_ptr<void> table;
+    PFN_StopDriver stopFunc = nullptr;
+    PFN_UninstallDriver uninstallFunc = nullptr;
+
+    // 析构函数：当最后一个 shared_ptr 被销毁时触发
+    ~DriverContext() {
+        if (handle) {
+            if (stopFunc) {
+                stopFunc(); // 停止业务逻辑
+            }
+            CLOSE_LIB(handle); // 安全卸载 DLL
+        }
+    }
 };
 
 #endif
