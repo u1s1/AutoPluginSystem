@@ -7,7 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
-#include "AutoPluginDef.h"
+#include "PluginDef.h"
 
 #define LOW_SUPPORT_VERSION 1
 

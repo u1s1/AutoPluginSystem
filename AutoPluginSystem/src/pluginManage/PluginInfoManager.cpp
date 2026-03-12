@@ -45,7 +45,15 @@ void PluginInfoManager::Save()
         return;
     }
     for (const auto& pair : m_mapPluginInfo) {
-        m_configParser->setSectionData(pair.second);
+        const PluginInfo& info = pair.second;
+        // 业务层自己负责将 PluginInfo 转换为通用的 Map
+        std::map<std::string, std::string> data;
+        data["name"] = info.name;
+        data["version"] = info.version;
+        data["author"] = info.author;
+        data["description"] = info.description;
+        // 调用底层通用接口
+        m_configParser->setSectionData(info.id, data);
     }
     m_configParser->save();
 }

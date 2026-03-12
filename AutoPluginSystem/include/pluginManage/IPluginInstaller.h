@@ -1,7 +1,7 @@
 #ifndef IPLUGININSTALLER_H
 #define IPLUGININSTALLER_H
 
-#include "AutoPluginDef.h"
+#include "PluginDef.h"
 #include "PluginInfoManager.h"
 
 class IPluginInstaller {

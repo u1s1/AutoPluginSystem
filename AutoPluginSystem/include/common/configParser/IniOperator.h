@@ -8,7 +8,6 @@
 #include <vector>
 #include <algorithm>
 #include <mutex>
-#include "AutoPluginDef.h"
 #include "IConfigParser.h"
 
 class IniOperator :public IConfigParser
@@ -39,7 +38,8 @@ public:
     // 获取特定 Section 下的所有键值对
     std::map<std::string, std::string> getSectionData(const std::string &section) override;
 
-    bool setSectionData(const PluginInfo &info) override;
+    bool setSectionData(const std::string& section, 
+        const std::map<std::string, std::string>& sectionData) override;
 
     // 获取具体的某一个值 (带默认值保护)
     std::string getValue(const std::string &section, const std::string &key, const std::string &defaultValue = "") override;

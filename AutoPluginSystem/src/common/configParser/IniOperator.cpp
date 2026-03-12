@@ -125,13 +125,13 @@ std::map<std::string, std::string> IniOperator::getSectionData(const std::string
     return {}; // 如果没找到则返回空 map
 }
 
-bool IniOperator::setSectionData(const PluginInfo &info)
+bool IniOperator::setSectionData(const std::string& section, const std::map<std::string, std::string>& sectionData)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_data[info.id]["name"] = info.name;
-    m_data[info.id]["version"] = info.version;
-    m_data[info.id]["author"] = info.author;
-    m_data[info.id]["description"] = info.description;
+    for(const auto& it : sectionData)
+    {
+        m_data[section][it.first] = it.second;
+    }
     m_isDirty = true;
     return true;
 }

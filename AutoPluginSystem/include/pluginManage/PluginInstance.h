@@ -5,7 +5,7 @@
 #include <iostream>
 #include "AutoPluginABI.h"
 #include "AutoPluginRegister.h"
-#include "AutoPluginDef.h"
+#include "PluginDef.h"
 #include "PluginInfoManager.h"
 
 class PluginInstance {

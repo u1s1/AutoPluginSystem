@@ -1,5 +1,5 @@
-#ifndef AUTO_PLUGIN_DEF_H
-#define AUTO_PLUGIN_DEF_H
+#ifndef PLUGIN_DEF_H
+#define PLUGIN_DEF_H
 #include <string>
 
 #if defined(_WIN32)
@@ -24,4 +24,5 @@ struct PluginInfo{
     std::string description;
     bool running = false;
 };
+
 #endif

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <memory>
-#include "AutoPluginDef.h"
+#include "PluginDef.h"
 #include "IConfigParser.h"
 
 class PluginInfoManager{
