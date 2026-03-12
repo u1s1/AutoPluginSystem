@@ -5,14 +5,16 @@
 #include "AutoPluginRegister.h"
 #include "DriverManager.h"
 #include "AutoPluginDriverAPI.h"
+#include "IniOperator.h"
 #include <iostream>
 
 // 实现系统日志
 void AutoPluginLog(const char* message) {
     std::cout << "[Host System] " << message << std::endl;
 
-    DriverManager driverManager;
-    if (driverManager.LoadAndStart<DriverDispatchTable>( "AutoPluginDriver.dll", 1))
+    DriverManager driverManager(std::make_shared<DriverInfoManager>(std::make_unique<IniOperator>()),
+                                std::make_shared<SystemDriverRequireInfoManager>(std::make_unique<IniOperator>()));
+    if (driverManager.LoadByPath<DriverDispatchTable>( "AutoPluginDriver.dll", 1))
     {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
@@ -25,7 +27,7 @@ void AutoPluginLog(const char* message) {
         std::cout << "Failed to load or start driver." << std::endl;
     }
 
-    if (driverManager.LoadAndStart<DriverDispatchTable>("AutoPluginDriver.dll", 1)) {
+    if (driverManager.LoadByPath<DriverDispatchTable>("AutoPluginDriver.dll", 1)) {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
         int device = driverManager.GetDriverTable<DriverDispatchTable>()->CreateDevice();

@@ -21,20 +21,20 @@ void PluginInfoManager::Init()
     m_mapPluginInfo.clear();
 
     std::string configFilePath = GetExecutablePath() + "/plugin_info.ini"; // 假设配置文件路径固定
-    if (m_configParser->load(configFilePath)) {
-        auto sections = m_configParser->getAllSections();
-        for (const auto& section : sections) {
-            PluginInfo info;
-            info.id = section;
-            info.name = m_configParser->getValue(section, "name", "");
-            info.description = m_configParser->getValue(section, "description", "");
-            info.version = m_configParser->getValue(section, "version", "");
-            info.author = m_configParser->getValue(section, "author", "");
-            info.running = false;
-            m_mapPluginInfo[info.id] = info;
-        }
+    if (!m_configParser->load(configFilePath)) {
+        return;
     }
-    
+    auto sections = m_configParser->getAllSections();
+    for (const auto& section : sections) {
+        PluginInfo info;
+        info.id = section;
+        info.name = m_configParser->getValue(section, "name", "");
+        info.description = m_configParser->getValue(section, "description", "");
+        info.version = m_configParser->getValue(section, "version", "");
+        info.author = m_configParser->getValue(section, "author", "");
+        info.running = false;
+        m_mapPluginInfo[info.id] = info;
+    }
 }
 
 void PluginInfoManager::Save()

@@ -7,7 +7,9 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
-#include "PluginDef.h"
+#include "DriverDef.h"
+#include "DriverInfoManager.h"
+#include "SystemDriverRequireInfoManager.h"
 
 #define LOW_SUPPORT_VERSION 1
 
@@ -32,20 +34,23 @@ class DriverManager {
 private:
     std::mutex m_mutex;
     std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> m_drivers;
+    std::shared_ptr<DriverInfoManager> m_infoManager;
+    std::shared_ptr<SystemDriverRequireInfoManager> m_systemRequire;
 
 public:
-    DriverManager();
+    DriverManager(std::shared_ptr<DriverInfoManager> infoManager,
+                  std::shared_ptr<SystemDriverRequireInfoManager> systemRequire);
     ~DriverManager();
 
     // 模板化加载：宿主调用时必须指明期望的表类型 TTable
     template <typename TTable>
-    bool LoadAndStart(const char* pluginPath, uint32_t minVersion) {
+    bool LoadByPath(const char* pluginPath, uint32_t minVersion) {
         auto context = std::make_shared<DriverContext>();
         context->handle = LOAD_LIB(pluginPath);
         if (!context->handle) return false;
 
         // 宿主负责分配具体类型的内存块
-        auto pTable = std::make_shared<TTable>(); 
+        auto pTable = std::make_shared<TTable>();
         
         auto loadDriver = (PFN_LoadDriver)GET_FUNC(context->handle, "LoadDriver");
         context->stopFunc = (PFN_StopDriver)GET_FUNC(context->handle, "StopDriver");
@@ -66,6 +71,19 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
         m_drivers[std::type_index(typeid(TTable))] = std::move(context);
         return true;
+    }
+
+    template <typename TTable>
+    bool Load(const char* pluginID) 
+    {
+        DriverInfo info;
+        if (!m_infoManager->GetDriverInfo<TTable>(pluginID, info))
+        {
+            return false;
+        }
+        uint32_t minVersion = m_systemRequire->GetRequireInfo<TTable>().lowVersion;
+        std::string pluginPath = GetExecutablePath() + "/\\" + info.id + "/\\" + info.name + ".dll";
+        return LoadByPath<TTable>(pluginPath, minVersion);
     }
 
     template <typename TTable>
