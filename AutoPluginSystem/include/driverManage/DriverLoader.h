@@ -15,8 +15,9 @@ public:
     ~DriverLoader() = default;
 
     template <typename TTable>
-    bool LoadByPath(const char *pluginPath, uint32_t minVersion, 
-        std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> &drivers)
+    bool LoadByPath(const char *pluginPath, uint32_t minVersion,
+                    std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> &drivers,
+                    std::shared_ptr<DriverInfo> info = nullptr)
     {
         auto context = std::make_shared<DriverContext>();
         context->handle = LOAD_LIB(pluginPath);
@@ -40,6 +41,11 @@ public:
 
         // 将特定类型的智能指针向上转型为 void*，存入统一容器 (类型擦除)
         context->table = pTable;
+        if (info)
+        {
+            context->info = info;
+        }
+        
         Unload<TTable>(drivers);
         drivers[std::type_index(typeid(TTable))] = std::move(context);
         return true;
@@ -48,14 +54,14 @@ public:
     template <typename TTable>
     bool Load(const char *pluginID, std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> &drivers)
     {
-        DriverInfo info;
-        if (!m_infoManager->GetDriverInfo<TTable>(pluginID, info))
+        std::shared_ptr<DriverInfo> info = std::make_shared<DriverInfo>();
+        if (!m_infoManager->GetDriverInfo<TTable>(pluginID, info.get()))
         {
             return false;
         }
         uint32_t minVersion = m_systemRequire->GetRequireInfo<TTable>().lowVersion;
         std::string pluginPath = GetExecutablePath() + "/\\" + info.id + "/\\" + info.name + ".dll";
-        return LoadByPath<TTable>(pluginPath, minVersion, drivers);
+        return LoadByPath<TTable>(pluginPath, minVersion, drivers, info);
     }
 
     template <typename TTable>

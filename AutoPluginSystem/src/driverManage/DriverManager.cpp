@@ -1,7 +1,9 @@
 #include "DriverManager.h"
 
-DriverManager::DriverManager(std::shared_ptr<DriverLoader> loader) :
-    m_loader(loader)
+DriverManager::DriverManager(std::shared_ptr<DriverLoader> loader,
+        std::shared_ptr<DriverInstaller> installer) :
+    m_loader(loader),
+    m_installer(installer)
 {
 }
 

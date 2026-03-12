@@ -6,15 +6,18 @@
 #include <unordered_map>
 #include <typeindex>
 #include "DriverLoader.h"
+#include "DriverInstaller.h"
 
 class DriverManager {
 private:
     std::mutex m_mutex;
     std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> m_drivers;
     std::shared_ptr<DriverLoader> m_loader;
+    std::shared_ptr<DriverInstaller> m_installer;
 
 public:
-    DriverManager(std::shared_ptr<DriverLoader> loader);
+    DriverManager(std::shared_ptr<DriverLoader> loader,
+        std::shared_ptr<DriverInstaller> installer);
     ~DriverManager();
 
     // 模板化加载：宿主调用时必须指明期望的表类型 TTable
@@ -41,22 +44,10 @@ public:
     void UnloadAll();
 
     template <typename TTable>
-    void Uninstall()
+    void Uninstall(const char* pluginID)
     {
-        std::shared_ptr<DriverContext> tempContext = nullptr;
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            tempContext = m_drivers[std::type_index(typeid(TTable))];
-            m_drivers[std::type_index(typeid(TTable))].reset();
-        }
-        if (tempContext != nullptr && tempContext->uninstallFunc != nullptr)
-        {
-            tempContext->uninstallFunc();
-        }
-        tempContext.reset();
-
-        //下面执行删除驱动文件及收尾操作
-        /* */
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_installer->Uninstall<TTable>(pluginID, m_drivers);
     }
 
     // 工作线程安全获取驱动表

@@ -34,6 +34,7 @@ struct DriverContext {
     std::shared_ptr<void> table;
     PFN_StopDriver stopFunc = nullptr;
     PFN_UninstallDriver uninstallFunc = nullptr;
+    std::shared_ptr<DriverInfo> info = nullptr;
 
     // 析构函数：当最后一个 shared_ptr 被销毁时触发
     ~DriverContext() {
