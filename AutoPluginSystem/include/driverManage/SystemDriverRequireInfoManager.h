@@ -28,7 +28,7 @@ public:
     template <typename TTable>
     const SystemDriverInfo GetRequireInfo()
     {
-        auto it = m_info.find(name);
+        auto it = m_info.find(std::type_index(typeid(TTable)));
         if (it == m_info.end()) 
         {
             return {};

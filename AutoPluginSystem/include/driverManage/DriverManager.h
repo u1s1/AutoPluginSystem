@@ -31,7 +31,7 @@ public:
     bool Load(const char* pluginID) 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        return m_loader->Load<TTable>(m_drivers);
+        return m_loader->Load<TTable>(pluginID, m_drivers);
     }
 
     template <typename TTable>
@@ -42,6 +42,13 @@ public:
     }
 
     void UnloadAll();
+
+    template <typename TTable>
+    bool Install(const char* pluginPath)
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_installer->Install<TTable>(pluginPath);
+    }
 
     template <typename TTable>
     void Uninstall(const char* pluginID)

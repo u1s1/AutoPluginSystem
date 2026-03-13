@@ -17,28 +17,25 @@ void AutoPluginLog(const char* message) {
         std::make_shared<SystemDriverRequireInfoManager>(std::make_unique<IniOperator>()));
     std::shared_ptr<DriverInstaller> installer = std::make_shared<DriverInstaller>(infoManager);
     DriverManager driverManager(loader, installer);
-    if (driverManager.LoadByPath<DriverDispatchTable>( "AutoPluginDriver.dll", 1))
+    if (driverManager.Install<DriverDispatchTable>( "D:/git/AutoPluginSystem/DriverSDK/build/Release/AutoPluginDriver.dll"))
     {
+        std::cout << "Install driver successfully!" << std::endl;
+    }
+    else
+    {
+        std::cout << "Failed to Install driver" << std::endl;
+    }
+
+    if (driverManager.Load<DriverDispatchTable>("com.AutoPluginDriver")) {
         std::cout << "Driver loaded and started successfully!" << std::endl;
         // 这里可以通过 driverManager.m_driverTable 调用驱动函数
         int device = driverManager.GetDriverTable<DriverDispatchTable>()->CreateDevice();
         driverManager.GetDriverTable<DriverDispatchTable>()->DestroyDevice(device);
         driverManager.Unload<DriverDispatchTable>();
-    }
-    else
-    {
-        std::cout << "Failed to load or start driver." << std::endl;
-    }
-
-    if (driverManager.LoadByPath<DriverDispatchTable>("AutoPluginDriver.dll", 1)) {
-        std::cout << "Driver loaded and started successfully!" << std::endl;
-        // 这里可以通过 driverManager.m_driverTable 调用驱动函数
-        int device = driverManager.GetDriverTable<DriverDispatchTable>()->CreateDevice();
-        driverManager.GetDriverTable<DriverDispatchTable>()->DestroyDevice(device);
-        driverManager.Uninstall<DriverDispatchTable>("AutoPluginDriver");
     } else {
         std::cout << "Failed to load or start driver." << std::endl;
     }
+    driverManager.Uninstall<DriverDispatchTable>("com.AutoPluginDriver");
 }
 EXPORT_HOST_API(AutoPluginLog); // 原地注册！
 

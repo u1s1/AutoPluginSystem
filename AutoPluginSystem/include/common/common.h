@@ -19,6 +19,15 @@
 #define MKDIR(a) mkdir(a, 0755)
 #endif
 
+#include <filesystem>
+#include <iostream>
+
+namespace fs = std::filesystem;
+
 std::string GetExecutablePath();
+
+bool Copy_directory_recursive(const fs::path &source, const fs::path &destination);
+
+bool Copy_single_file(const fs::path &sourceFile, const fs::path &targetPath);
 
 #endif

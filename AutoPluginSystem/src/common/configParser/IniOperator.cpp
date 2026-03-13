@@ -79,9 +79,9 @@ bool IniOperator::save()
     }
 
     // 遍历所有 Section
-    for (const auto& sectionPair : m_data) {
+    for (auto& sectionPair : m_data) {
         // 写入 Section 头
-        file << "[" << sectionPair.first << "]\n";
+        file << "[" << sectionPair.second["id"] << "]\n";
         
         // 遍历并写入该 Section 下的所有键值对
         for (const auto& keyValuePair : sectionPair.second) {

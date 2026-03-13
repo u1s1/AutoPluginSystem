@@ -49,6 +49,7 @@ public:
         info.description = m_configParser->getValue(sections[0], "description", "");
         info.version = m_configParser->getValue(sections[0], "version", "");
         info.author = m_configParser->getValue(sections[0], "author", "");
+        info.defaultLoad = m_configParser->getValue(sections[0], "defaultLoad", "") == "true";
         info.running = false;
 
         return true;
@@ -77,7 +78,7 @@ public:
                     return 4; // 已存在同名插件但作者不同
                 }
                 
-                if (it->second.find(info.id)->second.version >= info.version)
+                if (it->second.find(info.id)->second.version > info.version)
                 {
                     return 2; // 已存在同名插件且版本不低于当前版本
                 }
@@ -108,11 +109,11 @@ public:
             return false;
         }
 
-        if (it->second.find(info.id) == it->second.end())
+        if (it->second.find(driverID) == it->second.end())
         {
             return false;
         }
-        info = it->second.find(info.id)->second;
+        info = it->second.find(driverID)->second;
 
         return true;
     }
@@ -156,7 +157,7 @@ public:
             {
                 return false;
             }
-            m_mapDriverInfo.erase(itDelete);
+            m_mapDriverInfo[std::type_index(typeid(TTable))].erase(itDelete);
         }
         //接下来保存已经删除插件的新信息到配置文件
         if (saveNow)

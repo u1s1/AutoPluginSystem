@@ -1,9 +1,6 @@
 #ifndef INSTALL_OPERATOR_H
 #define INSTALL_OPERATOR_H
 #include "IPluginInstaller.h"
-#include <filesystem>
-
-namespace fs = std::filesystem;
 
 class InstallOperator : public IPluginInstaller {
 public:
@@ -17,8 +14,6 @@ public:
 
 private:
     std::shared_ptr<PluginInfoManager> m_infoManager;
-    bool copy_directory_recursive(const fs::path &source, const fs::path &destination);
-    bool copy_single_file(const fs::path &sourceFile, const fs::path &targetPath);
 };
 
 #endif

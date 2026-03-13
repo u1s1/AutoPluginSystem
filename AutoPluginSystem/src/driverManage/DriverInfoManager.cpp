@@ -16,6 +16,11 @@ void DriverInfoManager::Init()
     std::lock_guard<std::mutex> lock(m_mutex);
     //解析配置文件，填充 m_mapPluginInfo
     m_mapDriverInfo.clear();
+    auto allTypeName = DriverRTTIInfo::GetAllTypeID();
+    for (auto &it : allTypeName)
+    {
+        m_mapDriverInfo[it] = std::unordered_map<std::string, DriverInfo>();
+    }
 
     std::string configFilePath = GetExecutablePath() + "/driver_info.ini"; // 假设配置文件路径固定
     if (!m_configParser->load(configFilePath)) {
@@ -39,10 +44,11 @@ void DriverInfoManager::Init()
 void DriverInfoManager::Save()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_configParser->load(GetExecutablePath() + "/driver_info.ini"))
+    if (!m_configParser->load(GetExecutablePath() + "/driver_info.ini"))
     {
         return;
     }
+    std::map<std::string, std::map<std::string, std::string>> newData;
     for (const auto& pair : m_mapDriverInfo) {
         for(const auto& subPair : pair.second)
         {
@@ -50,14 +56,15 @@ void DriverInfoManager::Save()
             // 业务层自己负责将 PluginInfo 转换为通用的 Map
             std::map<std::string, std::string> data;
             data["moduleName"] =  info.moduleName;
+            data["id"] = info.id;
             data["name"] = info.name;
             data["version"] = info.version;
             data["author"] = info.author;
             data["description"] = info.description;
             data["defaultLoad"] = info.defaultLoad ? "true" : "false";
-            // 调用底层通用接口
-            m_configParser->setSectionData(info.id, data);
+            newData[DriverRTTIInfo::GetTypeName(pair.first)] = data;
         }
     }
+    m_configParser->replaceAllData(newData);
     m_configParser->save();
 }

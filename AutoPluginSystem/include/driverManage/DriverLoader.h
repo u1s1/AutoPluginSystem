@@ -54,14 +54,15 @@ public:
     template <typename TTable>
     bool Load(const char *pluginID, std::unordered_map<std::type_index, std::shared_ptr<DriverContext>> &drivers)
     {
-        std::shared_ptr<DriverInfo> info = std::make_shared<DriverInfo>();
-        if (!m_infoManager->GetDriverInfo<TTable>(pluginID, info.get()))
+        DriverInfo info;
+        if (!m_infoManager->GetDriverInfo<TTable>(pluginID, info))
         {
             return false;
         }
         uint32_t minVersion = m_systemRequire->GetRequireInfo<TTable>().lowVersion;
         std::string pluginPath = GetExecutablePath() + "/\\" + info.id + "/\\" + info.name + ".dll";
-        return LoadByPath<TTable>(pluginPath, minVersion, drivers, info);
+        std::shared_ptr<DriverInfo> infoPtr = std::make_shared<DriverInfo>(info);
+        return LoadByPath<TTable>(pluginPath.c_str(), minVersion, drivers, infoPtr);
     }
 
     template <typename TTable>
